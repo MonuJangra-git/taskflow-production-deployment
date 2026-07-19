@@ -11,12 +11,13 @@ These are actual terminal screenshots captured while deploying this project on a
 <details>
 <summary><strong>2. drizzle-kit: command not found</strong></summary>
 <br>
-<img width="1496" height="621" alt="Screenshot 2026-07-13 235411" src="https://github.com/user-attachments/assets/73d1292f-7bd3-46b5-95e5-ba5282c99781" /></details>
+<img width="1252" height="397" alt="Screenshot 2026-07-13 235534" src="https://github.com/user-attachments/assets/2bb4f75b-0cfe-42c7-a164-9e48b071793b" /></details>
+
 
 <details>
 <summary><strong>3. TypeScript project reference build order failure</strong></summary>
 <br>
-<img width="1252" height="397" alt="Screenshot 2026-07-13 235534" src="https://github.com/user-attachments/assets/2bb4f75b-0cfe-42c7-a164-9e48b071793b" /></details>
+<img width="1496" height="621" alt="Screenshot 2026-07-13 235411" src="https://github.com/user-attachments/assets/73d1292f-7bd3-46b5-95e5-ba5282c99781" /></details>
 
 <details>
 <summary><strong>4. Root build script failing on unrelated mockup-sandbox package</strong></summary>
