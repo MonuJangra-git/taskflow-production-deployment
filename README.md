@@ -66,8 +66,8 @@ serving the built frontend as static files.
 
 ### Phase 2 — Docker Architecture
 
-```
 <img width="1024" height="1166" alt="Copilot_20260719_141637" src="https://github.com/user-attachments/assets/99af2f49-2b1a-4168-9cb0-e31e18acaafd" />
+```
 All containers communicate via Docker internal network
 Only Nginx is exposed to the outside world
 ```
