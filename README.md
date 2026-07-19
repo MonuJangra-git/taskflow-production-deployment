@@ -728,7 +728,7 @@ All errors that I faced during deployment is in error-proofs folder and also I m
 * AWS IAM 
 * Infrastructure evolution (bare metal → containers)
 * Backup using S3 and volume in local machine or EC2
-* Shell scripting
+* Shell scripting and AWS cli
 
 ---
 
