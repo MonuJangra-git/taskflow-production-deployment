@@ -1,0 +1,50 @@
+version: "3.9"
+
+services:
+
+  postgres:
+    image: postgres:15
+    container_name: app_postgres
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - app_network
+
+  api:
+    build:
+      context: .
+      dockerfile: artifacts/api-server/Dockerfile
+    container_name: app_api
+    restart: always
+    env_file:
+      - .env
+    depends_on:
+      - postgres
+    ports:
+      - "3000:3000"
+    networks:
+      - app_network
+
+  frontend:
+    build:
+      context: .
+      dockerfile: artifacts/taskflow/Dockerfile
+    container_name: app_frontend
+    restart: always
+    depends_on:
+      - api
+    ports:
+      - "8080:80"
+    networks:
+      - app_network
+
+volumes:
+  pgdata:
+
+networks:
+  app_network:
