@@ -201,7 +201,7 @@ WantedBy=multi-user.target
 ```bash
 sudo systemctl daemon-reload
 sudo systemctl enable --now taskflow-api
-```<img width="1024" height="1305" alt="Copilot_20260719_141342" src="https://github.com/user-attachments/assets/755103fe-2c5e-45cf-adee-201750126834" />
+```
 
 
 ---
