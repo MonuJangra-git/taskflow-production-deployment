@@ -11,7 +11,7 @@ This project demonstrates **two complete deployment approaches**:
 
 Both phases reflect real-world DevOps workflows used in production environments.
 
-##Website insights are available on website-proofs folder in a well documented manner.
+# Website insights are available on website-proofs folder in a well documented manner.
 
 ---
 ## 📌 Project Scope
