@@ -1,64 +1,117 @@
-Here’s a **portfolio-optimized README.md** — polished, recruiter-friendly, and structured to highlight real DevOps  and AWS EC2 skills. Copy-paste this directly into your GitHub repo.
+# 🚀 TaskFlow — Production Deployment (Linux + Nginx + systemd → Docker)
 
-markdown
----
+> A full-stack task management application, self-hosted and deployed from scratch —
+> first on a raw Linux VM, then containerized with Docker.
+> No managed platforms. No shortcuts. Real infrastructure.
 
-## 📌 Project Scope
+This project demonstrates **two complete deployment approaches**:
+- **Phase 1** — Traditional Linux deployment (Nginx + systemd + PostgreSQL)
+- **Phase 2** — Containerized deployment using Docker & Docker Compose
 
-This project focuses on infrastructure, deployment, and operational debugging of a full-stack application in a production-like Linux environment.
-
-The core objective was to simulate real-world DevOps responsibilities:
-
-- Deploying an existing codebase
-- Managing environment configuration
-- Handling build systems and monorepos
-- Configuring reverse proxy and TLS
-- Securing runtime permissions
-- Diagnosing and resolving production errors
-
-The emphasis is on system reliability, security, and deployment architecture rather than feature development.
-# 🚀 TaskFlow — Production Deployment (Linux + Nginx + systemd)
-
-> A full-stack task management application, self-hosted and deployed from scratch on a Linux VM — without relying on managed platforms like Vercel, Railway, or Replit.
-
-This project demonstrates **end-to-end production deployment**: server provisioning, reverse proxy configuration, process management, database setup, environment security, and HTTPS — the same workflow used in real-world DevOps environments.
+Both phases reflect real-world DevOps workflows used in production environments.
 
 ---
 
 ## 📸 Preview
 
-<!-- Add screenshots here -->
 | Landing Page |
-| <img width="1485" height="731" alt="Screenshot 2026-07-14 001952" src="https://github.com/user-attachments/assets/fba6a321-9ee9-42bb-b722-efcba35425d8" />
-|Dashboard|
-| <img width="1531" height="732" alt="Screenshot 2026-07-13 231811" src="https://github.com/user-attachments/assets/043e1144-542e-4565-b17f-27b77024569f" />
-|Study Hub|
-| <img width="1532" height="767" alt="Screenshot 2026-07-13 231843" src="https://github.com/user-attachments/assets/b7f9fa02-169c-4333-a862-5ad84a42ff37" />
- |
+|---|
+| <img width="1485" height="731" alt="Screenshot 2026-07-14 001952" src="https://github.com/user-attachments/assets/fba6a321-9ee9-42bb-b722-efcba35425d8" /> |
+
+| Dashboard |
+|---|
+| <img width="1531" height="732" alt="Screenshot 2026-07-13 231811" src="https://github.com/user-attachments/assets/043e1144-542e-4565-b17f-27b77024569f" /> |
+
+| Study Hub |
+|---|
+| <img width="1532" height="767" alt="Screenshot 2026-07-13 231843" src="https://github.com/user-attachments/assets/b7f9fa02-169c-4333-a862-5ad84a42ff37" /> |
+
+---
+
+## 📌 Project Scope
+
+This project focuses on **infrastructure, deployment, and operational debugging** of a
+full-stack application in a production-like Linux environment.
+
+Real-world DevOps responsibilities simulated:
+
+- Deploying an existing codebase on raw Linux
+- Managing environment configuration & secrets
+- Handling build systems and monorepos
+- Configuring reverse proxy and TLS
+- Securing runtime permissions
+- Diagnosing and resolving production errors
+- Containerizing with Docker for portability and reproducibility
+
+The emphasis is on **system reliability, security, and deployment architecture**
+rather than feature development.
 
 ---
 
 ## 🏗 System Architecture
 
-<img width="1248" height="832" alt="grok-imagine-image-quality_a_Client_(Browser)_│_▼" src="https://github.com/user-attachments/assets/2253dbf1-aac8-4932-b187-8bf3ce201289" />
+### Phase 1 — Traditional Linux Deployment
 
+<img width="1248" height="832" alt="Architecture" src="https://github.com/user-attachments/assets/2253dbf1-aac8-4932-b187-8bf3ce201289" />
 
-**Key design decision:** the API server is never exposed directly to the internet — Nginx is the single public entry point, forwarding `/api/*` internally while serving the built frontend as static files.
+**Key design decision:** The API server is never exposed directly to the internet.
+Nginx is the single public entry point — forwarding `/api/*` internally while
+serving the built frontend as static files.
+
+---
+
+### Phase 2 — Docker Architecture
+
+```
+┌─────────────────────────────────────────────────────┐
+│                    Browser / Client                  │
+└─────────────────────┬───────────────────────────────┘
+                      │ HTTPS :443 / HTTP :80
+┌─────────────────────▼───────────────────────────────┐
+│              Nginx Container (Reverse Proxy)          │
+│   /api/*  ──────────────────────► API Container      │
+│   /*  ──► serves static frontend files               │
+└──────────────────────────────────────────────────────┘
+                      │
+          ┌───────────▼──────────┐
+          │    API Container     │
+          │  Node.js :8080       │
+          └───────────┬──────────┘
+                      │
+          ┌───────────▼──────────┐
+          │  PostgreSQL Container │
+          │  postgres:15          │
+          └──────────────────────┘
+
+All containers communicate via Docker internal network
+Only Nginx is exposed to the outside world
+```
 
 ---
 
 ## 🧰 Tech Stack
 
 | Layer | Technology |
-|-------|-----------|
+|---|---|
 | Frontend | React + Vite (TypeScript) |
 | Backend | Node.js (TypeScript, monorepo) |
 | Database | PostgreSQL |
 | Reverse Proxy | Nginx |
-| Process Manager | systemd |
+| Process Manager | systemd (Phase 1) / Docker (Phase 2) |
+| Containerization | Docker + Docker Compose |
 | Auth | Clerk |
 | TLS | Let's Encrypt (Certbot) |
 | Package Manager | pnpm (monorepo) |
+| Cloud | AWS EC2 |
+
+---
+
+---
+
+# 📦 Phase 1 — Traditional Linux Deployment
+
+> Deployed directly on Ubuntu Linux using Nginx, systemd, and PostgreSQL
+> installed on the host machine. No containers.
 
 ---
 
@@ -74,7 +127,7 @@ curl -fsSL https://deb.nodesource.com/setup_24.x | sudo -E bash -
 sudo apt install -y nodejs
 
 sudo npm install -g pnpm@10
-````
+```
 
 ---
 
@@ -122,7 +175,7 @@ BASE_PATH=/
 VITE_CLERK_PUBLISHABLE_KEY=pk_live_xxxxx
 ```
 
-> Secrets are never committed. `.env*` is git-ignored.
+> ⚠️ Secrets are never committed. `.env*` is git-ignored.
 
 ---
 
@@ -168,7 +221,7 @@ sudo systemctl enable --now taskflow-api
 
 ### 7. Nginx Reverse Proxy
 
-nginx
+```nginx
 server {
     listen 80;
     server_name your-domain.com;
@@ -190,7 +243,7 @@ server {
         try_files $uri /index.html;
     }
 }
-
+```
 
 ```bash
 sudo nginx -t
@@ -207,7 +260,7 @@ sudo certbot --nginx -d your-domain.com
 
 ---
 
-## ✅ Verification
+## ✅ Phase 1 Verification
 
 ```bash
 curl http://127.0.0.1:8080/api/healthz
@@ -216,7 +269,7 @@ curl https://your-domain.com/api/healthz
 
 ---
 
-## 🔁 Redeployment Workflow
+## 🔁 Phase 1 Redeployment Workflow
 
 ```bash
 cd /opt/taskflow
@@ -229,7 +282,7 @@ sudo systemctl reload nginx
 
 ---
 
-## 🪵 Logs & Monitoring
+## 🪵 Phase 1 Logs & Monitoring
 
 ```bash
 sudo journalctl -u taskflow-api -f
@@ -238,62 +291,227 @@ sudo tail -f /var/log/nginx/error.log
 
 ---
 
-## 🧩 Challenges Faced by me and how I fixed them 
+---
 
-Here's the expanded **Challenges Solved** section with the actual fixes and commands used — based on the real debugging you did. Copy-paste ready:
+# 🐳 Phase 2 — Docker Deployment
 
-markdown
-## 🧩 Challenges Solved
-
-During deployment, several real production issues were encountered and debugged. Below is each issue with the exact fix applied.
+> Same application, now fully containerized.
+> Each service runs in its own isolated container.
+> Entire stack starts with a single command.
 
 ---
 
-### 1️⃣ Missing `DATABASE_URL` during schema push
+## 💡 Why Docker After Phase 1?
+
+| Problem in Phase 1 | How Docker Solves It |
+|---|---|
+| "Works on my machine" issues | Every environment runs identical containers |
+| Manual dependency installation | All deps baked into image |
+| Systemd config per server | `docker-compose up` everywhere |
+| Hard to scale individual services | Each container scales independently |
+| Environment setup takes hours | New server ready in minutes |
+
+---
+
+## 📁 Docker File Structure
+
+```
+taskflow/
+├── Dockerfile.api          # API server image
+├── Dockerfile.frontend     # Frontend build image  
+├── docker-compose.yml      # Orchestrates all services
+├── nginx/
+│   └── default.conf        # Nginx config for Docker
+├── .env.docker             # Docker environment variables
+└── .dockerignore           # Files excluded from image
+```
+
+---
+
+## 🐳 Dockerfile — API Server
+
+---
+Note:- All Dockerfile and docker-compose files are provided in this project , user can check these files in the project files inside the project.
+1. docker-compose.yml :- /docker-compose.yml
+2. Dockerfile-frontend :- /artifacts/taskflow/Dockerfile
+3. Dockerfile-backend :- /artifacts/api-server/Dockerfile
+---
+
+
+
+
+---
+
+## 🔑 Environment Variables for Docker
+
+`.env.docker` (never committed — add to `.gitignore`)
+
+```env
+# Database
+DB_PASSWORD=your_strong_password_here
+
+# API
+CLERK_SECRET_KEY=sk_live_xxxxx
+SESSION_SECRET=your_generated_secret_here
+
+# Frontend (build-time)
+VITE_CLERK_PUBLISHABLE_KEY=pk_live_xxxxx
+```
+
+---
+
+## 🚀 Running with Docker
+
+### First Time Setup
+
+```bash
+# 1. Clone the repo
+git clone <repo-url>
+cd taskflow
+
+# 2. Create your environment file
+cp .env.docker.example .env.docker
+# Fill in your actual secrets in .env.docker
+
+# 3. Run database migrations
+docker compose run --rm api node dist/migrate.mjs
+
+# 4. Start everything
+docker compose --env-file .env.docker up -d --build
+```
+
+---
+
+### Daily Commands
+
+```bash
+# Start all services
+docker compose up -d
+
+# Stop all services
+docker compose down
+
+# View logs (all services)
+docker compose logs -f
+
+# View logs (specific service)
+docker compose logs -f api
+docker compose logs -f frontend
+docker compose logs -f db
+
+# Rebuild after code changes
+docker compose up -d --build
+
+# Check running containers
+docker compose ps
+```
+
+---
+
+## ✅ Phase 2 Verification
+
+```bash
+# Check all containers are running
+docker compose ps
+
+# Test API directly inside network
+docker compose exec api wget -qO- http://localhost:8080/api/healthz
+
+# Test through Nginx proxy
+curl http://localhost/api/healthz
+
+# Check database connection
+docker compose exec db psql -U taskflow -c "\l"
+```
+
+---
+
+## 🔁 Phase 2 Redeployment Workflow
+
+```bash
+cd /opt/taskflow
+git pull
+
+# Rebuild and restart with zero manual steps
+docker compose --env-file .env.docker up -d --build
+
+# Remove old unused images
+docker image prune -f
+```
+
+---
+
+## 🪵 Phase 2 Logs & Monitoring
+
+```bash
+# Follow all logs
+docker compose logs -f
+
+# API logs only
+docker compose logs -f api
+
+# Check resource usage
+docker stats
+
+# Inspect a container
+docker inspect taskflow_api
+```
+
+---
+
+---
+
+## 🧩 Challenges Solved
+
+During both deployments, several real production issues were
+encountered and debugged.
+
+---
+
+### Phase 1 Challenges
+
+---
+
+#### 1️⃣ Missing `DATABASE_URL` during schema push
 
 **Problem:**
+```
+DATABASE_URL, ensure the database is provisioned
+ERR_PNPM_RECURSIVE_RUN_FIRST_FAIL
+```
 
+**Cause:** `.env.production` is only loaded by the systemd service at runtime —
+not automatically available in an interactive shell session.
 
-DATABASE\_URL, ensure the database is provisioned
-ERR\_PNPM\_RECURSIVE\_RUN\_FIRST\_FAIL
-
-
-
-**Cause:** `.env.production` is only loaded by the systemd service at runtime — it is **not** automatically available in an interactive shell session.
-
-**Fix:** Exported the variable manually before running the schema push:
-
+**Fix:**
 ```bash
 export DATABASE_URL="postgresql://taskflow:password@localhost:5432/taskflow"
 pnpm --filter @workspace/db run push
-````
+```
 
 ---
 
-### 2️⃣ `drizzle-kit: command not found`
+#### 2️⃣ `drizzle-kit: command not found`
 
-**Problem:** Running `drizzle-kit` directly failed since it's a local dependency, not a global binary.
+**Problem:** Running `drizzle-kit` directly failed since it's a local dependency.
 
-**Fix:** Always run it through the package's `pnpm` script instead of invoking the binary directly:
-
+**Fix:**
 ```bash
 pnpm --filter @workspace/db run push
 ```
 
 ---
 
-### 3️⃣ TypeScript project reference build order failure
+#### 3️⃣ TypeScript project reference build order failure
 
 **Problem:**
-
 ```
-error TS6305: Output file '.../lib/db/dist/index.d.ts' has not been built from source file
+error TS6305: Output file '.../lib/db/dist/index.d.ts' has not been built
 ```
 
-**Cause:** The monorepo uses TypeScript **project references**. Running `tsc -p tsconfig.json` directly on `api-server` skipped building its dependencies (`lib/db`, `lib/api-zod`) first.
+**Cause:** Running `tsc -p tsconfig.json` directly skipped building dependencies.
 
-**Fix:** Used TypeScript's build mode, which resolves references and builds dependencies in the correct order:
-
+**Fix:**
 ```bash
 pnpm exec tsc -b --clean
 pnpm exec tsc -b
@@ -301,20 +519,15 @@ pnpm exec tsc -b
 
 ---
 
-### 4️⃣ Root build script trying to build unrelated packages
+#### 4️⃣ Root build script building unrelated packages
 
 **Problem:**
-
 ```
-vite build
-Error: PORT environment variable is required but was not provided.
 @workspace/mockup-sandbox build failed
+Error: PORT environment variable is required
 ```
 
-**Cause:** The root `pnpm run build` script recursively builds **every** workspace package, including a dev-only `mockup-sandbox` package that isn't needed in production and requires its own env vars.
-
-**Fix:** Scoped the build to only the packages actually needed for deployment:
-
+**Fix:**
 ```bash
 pnpm --filter ./artifacts/taskflow run build
 pnpm --filter ./artifacts/api-server run build
@@ -322,18 +535,14 @@ pnpm --filter ./artifacts/api-server run build
 
 ---
 
-### 5️⃣ Vite build failing due to missing `PORT`
+#### 5️⃣ Vite build failing due to missing `PORT`
 
 **Problem:**
-
 ```
 Error: PORT environment variable is required but was not provided.
 ```
 
-**Cause:** Vite's build-time config reads `PORT` from `process.env`, but the shell running the build had no environment variables exported (they only existed in `.env.production`, which isn't auto-loaded).
-
-**Fix:** Exported the required build-time variables before running the build:
-
+**Fix:**
 ```bash
 export PORT=5173
 export BASE_PATH=/
@@ -344,87 +553,158 @@ pnpm --filter ./artifacts/taskflow run build
 
 ---
 
-### 6️⃣ `systemd` service failing with `CHDIR permission denied`
+#### 6️⃣ `systemd` service failing with `CHDIR permission denied`
 
 **Problem:**
-
 ```
 Changing to the requested working directory failed: Permission denied
-Failed at step CHDIR spawning /usr/bin/node: Permission denied
 status=200/CHDIR
 ```
 
-**Cause:** The service runs as a dedicated `taskflow` system user, but the project lived under `/home/ubuntu/...`. Linux blocks directory traversal unless every parent directory grants execute (`x`) permission to that user — even if the target folder itself is owned correctly.
+**Cause:** Service ran as `taskflow` user but project was under `/home/ubuntu/`
+— Linux blocks traversal without execute permission on every parent.
 
-**Fix:** Granted traversal permission on the parent directories:
-
+**Fix:**
 ```bash
 sudo chmod o+rx /home/ubuntu
 sudo chmod -R o+rx /home/ubuntu/main-website
-
 sudo systemctl restart taskflow-api
-sudo systemctl status taskflow-api
 ```
 
-*(Longer-term fix: move the app to `/opt/taskflow` instead of a user's home directory, and `chown -R taskflow:taskflow` it — avoids this class of permission issue entirely.)*
+*(Long-term fix: Move app to `/opt/taskflow` — avoids this entirely)*
 
 ---
 
-### 7️⃣ `EACCES` permission denied in `node_modules/.vite-temp`
+#### 7️⃣ `EACCES` permission denied in `node_modules/.vite-temp`
 
 **Problem:**
+```
+Error: EACCES: permission denied, open '...node_modules/.vite-temp/...'
+```
 
-Error: EACCES: permission denied, open '.../node_modules/.vite-temp/vite.config.ts.timestamp-....mjs'
+**Cause:** Earlier build was accidentally run with `sudo pnpm`, creating
+root-owned files inside `node_modules`.
 
-
-**Cause:** An earlier build was accidentally run with `sudo pnpm ...`, which created files owned by `root` inside `node_modules`. Subsequent builds run as the normal user could no longer write to those paths.
-
-**Fix:** Restored correct ownership of the entire project directory instead of continuing to use `sudo`:
-
+**Fix:**
 ```bash
 sudo chown -R $USER:$USER /home/ubuntu/main-website
 rm -rf artifacts/taskflow/node_modules/.vite-temp
-
 pnpm --filter ./artifacts/taskflow run build
 ```
 
-**Rule applied going forward:** never run `pnpm`/`npm` build commands with `sudo` inside the project — fix ownership instead of escalating privileges.
+**Rule:** Never run `pnpm`/`npm` with `sudo`. Fix ownership instead.
 
 ---
 
-### 8️⃣ Nginx serving stale API response (`Cannot GET /`)
+#### 8️⃣ Nginx serving stale API response (`Cannot GET /`)
 
-**Problem:** Hitting `http://localhost:8080/` directly returned:
+**Problem:** `http://localhost:8080/` returned `Cannot GET /`
 
-```
-Cannot GET /
-```
-
-**Cause:** This was actually expected behavior, not a bug — the Node API only implements `/api/*` routes. The root path `/` is intentionally served by Nginx from the static frontend build, not by the API process.
+**Cause:** Expected — API only handles `/api/*` routes.
+Root `/` is intentionally served by Nginx.
 
 **Verification:**
-
 ```bash
-curl http://127.0.0.1:8080/api/healthz     # → {"status":"ok"}
-curl http://localhost/api/healthz          # → {"status":"ok"} via Nginx proxy
+curl http://127.0.0.1:8080/api/healthz    # → {"status":"ok"}
+curl http://localhost/api/healthz         # → {"status":"ok"} via Nginx
 ```
-
-Confirmed the separation of concerns (Nginx = static + proxy, Node = API only) was working as designed.
 
 ---
 
+### Phase 2 Challenges (Docker)
 
-Want me to also merge this directly into the full README from before so you have **one complete final file** ready to paste?
+---
+
+#### 9️⃣ Container starts but API can't reach database
+
+**Problem:**
+```
+Error: connect ECONNREFUSED 127.0.0.1:5432
+```
+
+**Cause:** Inside Docker, `localhost` refers to the container itself —
+not the database container.
+
+**Fix:** Use the service name as hostname in `DATABASE_URL`:
+```env
+# Wrong
+DATABASE_URL=postgresql://taskflow:pass@localhost:5432/taskflow
+
+# Correct
+DATABASE_URL=postgresql://taskflow:pass@db:5432/taskflow
+```
+
+Docker's internal DNS resolves `db` to the postgres container automatically.
+
+---
+
+#### 🔟 API container starts before database is ready
+
+**Problem:** API crashes on startup because PostgreSQL isn't ready yet.
+
+**Fix:** Added `healthcheck` to the `db` service and `depends_on` condition:
+
+```yaml
+depends_on:
+  db:
+    condition: service_healthy
+```
+
+Docker now waits for PostgreSQL to pass its health check before starting the API.
+
+---
+
+#### 1️⃣1️⃣ Build-time env vars not available in final image
+
+**Problem:** `VITE_CLERK_PUBLISHABLE_KEY` was undefined in the built frontend.
+
+**Cause:** Vite bakes env vars at build time — runtime container env vars
+don't work for `VITE_*` variables.
+
+**Fix:** Passed as Docker `ARG` during build:
+```yaml
+build:
+  args:
+    VITE_CLERK_PUBLISHABLE_KEY: ${VITE_CLERK_PUBLISHABLE_KEY}
+```
+
+```dockerfile
+ARG VITE_CLERK_PUBLISHABLE_KEY
+ENV VITE_CLERK_PUBLISHABLE_KEY=$VITE_CLERK_PUBLISHABLE_KEY
+RUN pnpm run build
+```
+
+---
+
+---
+
+## ⚖️ Phase 1 vs Phase 2 — Comparison
+
+| Aspect | Phase 1 (Linux + systemd) | Phase 2 (Docker) |
+|---|---|---|
+| Setup time on new server | ~1-2 hours | ~5 minutes |
+| Dependency management | Manual apt/npm installs | Baked into image |
+| Environment isolation | Shared OS packages | Fully isolated containers |
+| Process management | systemd | Docker restart policies |
+| Scaling | Manual | `docker compose scale` |
+| Portability | Server-specific | Run anywhere with Docker |
+| Debugging | `journalctl`, system logs | `docker compose logs` |
+| Database | Host PostgreSQL | Containerized PostgreSQL |
+| Rollback | Git + rebuild | Previous image tag |
+| Learning value | Deep Linux knowledge | Industry-standard DevOps |
+
 ---
 
 ## 🔐 Security Practices
 
-* API server bound to `127.0.0.1` only — never exposed publicly
+* API server never exposed publicly — internal network only
 * Only ports `80`/`443` open externally
-* `.env.production` excluded from version control
-* Secrets loaded via `EnvironmentFile`, not hardcoded
+* `.env*` files excluded from version control
+* Secrets loaded via environment files — never hardcoded
 * TLS enforced via Let's Encrypt with auto-renewal
-* Dedicated non-privileged system user (`taskflow`) running the service
+* Dedicated non-privileged system user in Phase 1
+* Non-root user inside Docker containers in Phase 2
+* Docker internal network — containers isolated from host
 
 ---
 
@@ -432,26 +712,32 @@ Want me to also merge this directly into the full README from before so you have
 
 * Linux server provisioning & hardening
 * Reverse proxy configuration (Nginx)
-* Process management with `systemd`
+* Process management with systemd
+* Docker multi-stage builds
+* Docker Compose orchestration
+* Container networking & service discovery
 * Production build pipelines (TypeScript monorepo)
 * Environment variable & secrets management
 * PostgreSQL setup & schema migration
-* TLS/SSL automation
-* Real-world debugging (permissions, build order, env scope)
-* AWS EC2 
+* TLS/SSL automation (Let's Encrypt)
+* Real-world debugging (permissions, build order, env scope, networking)
+* AWS EC2 deployment
+* Infrastructure evolution (bare metal → containers)
 
----
 ---
 
 ## 📬 Contact
 
-If you'd like to discuss this project, DevOps practices or notes (free of cost ), or potential opportunities:
+If you'd like to discuss this project, DevOps practices, or potential opportunities:
 
 - 🔗 LinkedIn: www.linkedin.com/in/monu-jangra-8b343437a
 - 📧 Email: jangramonu908@gmail.com
 - 💻 GitHub: https://github.com/MonuJangra-git
 
 Open to DevOps, Cloud, and Infrastructure roles.
+
+---
+
 ## 📄 License
 
 MIT
@@ -460,7 +746,8 @@ MIT
 
 ## 📌 Note
 
-This repository emphasizes deployment and infrastructure configuration.  
-Some UI/demo-specific files (e.g., Study Hub content) are not included, as the primary focus is on production setup and operational debugging.
+This repository emphasizes deployment and infrastructure configuration.
+Some UI/demo-specific files (e.g., Study Hub content) are not included,
+as the primary focus is on production setup and operational debugging.
 
----
+The project exists in two deployment phases — both fully documented above.
