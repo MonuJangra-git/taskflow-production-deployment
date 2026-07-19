@@ -632,6 +632,7 @@ All errors that I faced during deployment is in error-proofs folder and also I m
 * Real-world debugging (permissions, build order, env scope, networking)
 * AWS EC2 deployment
 * Infrastructure evolution (bare metal → containers)
+* Backup using S3 and volume in local machine or EC2 
 
 ---
 
